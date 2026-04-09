@@ -1,6 +1,6 @@
-import { motion, AnimatePresence } from 'motion/react';
+import { motion } from 'motion/react';
 import { Brain, Sparkles, Loader2, CheckCircle, BookOpen, Target, Zap, Plus, Minus } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { apiClient } from '../../services/api';
 
 interface GeneratedQuestion {
@@ -10,6 +10,12 @@ interface GeneratedQuestion {
   options?: string[];
   correctAnswer: string;
   explanation: string;
+}
+
+interface StoredQuiz {
+  _id?: string;
+  id?: string;
+  questions?: any[];
 }
 
 export default function QuizGeneratorPage() {
@@ -35,6 +41,46 @@ export default function QuizGeneratorPage() {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [userAnswers, setUserAnswers] = useState<{ [key: string]: string }>({});
   const [quizSubmitted, setQuizSubmitted] = useState(false);
+  const REATTEMPT_STORAGE_KEY = 'quizpulse_reattempt_quiz';
+
+  const mapStoredQuizToQuestions = (quiz: StoredQuiz): GeneratedQuestion[] => {
+    const questions = Array.isArray(quiz.questions) ? quiz.questions : [];
+    return questions.map((q: any, index: number) => ({
+      id: String(q?._id || q?.id || `${quiz._id || quiz.id}-q-${index}`),
+      type: q?.type,
+      question: q?.question,
+      options: q?.options,
+      correctAnswer: q?.correctAnswer,
+      explanation: q?.explanation || 'AI explanation is not available for this question yet.',
+    }));
+  };
+
+  useEffect(() => {
+    try {
+      const rawQuiz = sessionStorage.getItem(REATTEMPT_STORAGE_KEY);
+      if (!rawQuiz) {
+        return;
+      }
+
+      const parsedQuiz = JSON.parse(rawQuiz) as StoredQuiz;
+      const parsedQuestions = mapStoredQuizToQuestions(parsedQuiz);
+      if (!parsedQuestions.length) {
+        return;
+      }
+
+      setQuizId(String(parsedQuiz._id || parsedQuiz.id));
+      setGeneratedQuestions(parsedQuestions);
+      setCurrentQuestionIndex(0);
+      setUserAnswers({});
+      setQuizSubmitted(false);
+      setServerScore(null);
+      setApiError('');
+    } catch (error: any) {
+      console.error('Failed to load reattempt quiz payload:', error?.message || error);
+    } finally {
+      sessionStorage.removeItem(REATTEMPT_STORAGE_KEY);
+    }
+  }, []);
 
   const handleGenerate = async () => {
     if (!topic || !subject || !gradeClass) return;
@@ -85,7 +131,7 @@ export default function QuizGeneratorPage() {
   };
 
   const handleAnswerSelect = (questionId: string, answer: string) => {
-    setUserAnswers(prev => ({ ...prev, [questionId]: answer }));
+    setUserAnswers((prev) => ({ ...prev, [questionId]: answer }));
   };
 
   const handleSubmitQuiz = async () => {
@@ -595,6 +641,7 @@ export default function QuizGeneratorPage() {
           </button>
         </div>
       </motion.div>
+
     </div>
   );
 }
