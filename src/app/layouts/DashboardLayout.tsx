@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import {
   Home,
   Brain,
+  History,
   MessageSquare,
   TrendingUp,
   User,
@@ -44,6 +45,7 @@ export default function DashboardLayout() {
   const studentNavItems = [
     { path: '/dashboard', icon: Home, label: 'Dashboard' },
     { path: '/quiz-generator', icon: Brain, label: 'Quiz Generator' },
+    { path: '/quiz-history', icon: History, label: 'Quiz History' },
     { path: '/progress', icon: TrendingUp, label: 'Progress Predictor' },
     { path: '/messages', icon: MessageSquare, label: 'Messages' },
     { path: '/resources', icon: BookOpen, label: 'Resources' },
