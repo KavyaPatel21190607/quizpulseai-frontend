@@ -134,7 +134,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       setLoading(true);
       setError(null);
-      const apiBase = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api').replace('/api', '');
+      const apiBase = (import.meta.env.VITE_API_URL || 'https://quizpulseai-backend.onrender.com/api').replace('/api', '');
       const safeRedirect = redirectPath.startsWith('/') && !redirectPath.startsWith('//') ? redirectPath : '/dashboard';
       const oauthUrl = new URL(`${apiBase}/api/auth/google`);
       oauthUrl.searchParams.set('redirect', safeRedirect);
