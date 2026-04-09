@@ -6,6 +6,18 @@ export default function OAuthCallbackPage() {
   const navigate = useNavigate();
   const [error, setError] = useState('');
 
+  const decodeJwtPayload = (token: string) => {
+    try {
+      const payload = token.split('.')[1];
+      if (!payload) return null;
+      const normalized = payload.replace(/-/g, '+').replace(/_/g, '/');
+      const decoded = JSON.parse(atob(normalized));
+      return decoded;
+    } catch {
+      return null;
+    }
+  };
+
   useEffect(() => {
     const completeOAuth = async () => {
       try {
@@ -24,19 +36,40 @@ export default function OAuthCallbackPage() {
         apiClient.setToken(token);
         localStorage.setItem('quizpulse_token', token);
 
-        const profileResponse = await apiClient.getProfile();
-        const backendUser = profileResponse?.data?.user;
-
-        if (!backendUser) {
-          throw new Error('Failed to fetch user profile after OAuth login');
+        try {
+          const profileResponse = await apiClient.getProfile();
+          const backendUser = profileResponse?.data?.user;
+          if (backendUser) {
+            const userData = {
+              ...backendUser,
+              id: backendUser.id || backendUser._id,
+            };
+            localStorage.setItem('quizpulse_user', JSON.stringify(userData));
+          } else {
+            const decoded = decodeJwtPayload(token);
+            if (decoded) {
+              const fallbackUser = {
+                id: decoded.id,
+                role: decoded.role || 'student',
+                name: 'Google User',
+                email: '',
+              };
+              localStorage.setItem('quizpulse_user', JSON.stringify(fallbackUser));
+            }
+          }
+        } catch {
+          const decoded = decodeJwtPayload(token);
+          if (decoded) {
+            const fallbackUser = {
+              id: decoded.id,
+              role: decoded.role || 'student',
+              name: 'Google User',
+              email: '',
+            };
+            localStorage.setItem('quizpulse_user', JSON.stringify(fallbackUser));
+          }
         }
 
-        const userData = {
-          ...backendUser,
-          id: backendUser.id || backendUser._id,
-        };
-
-        localStorage.setItem('quizpulse_user', JSON.stringify(userData));
         window.location.replace(safeRedirect);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Google OAuth login failed');
