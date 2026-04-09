@@ -6,6 +6,7 @@ import OAuthCallbackPage from './pages/OAuthCallbackPage';
 import DashboardLayout from './layouts/DashboardLayout';
 import StudentDashboard from './pages/StudentDashboard';
 import QuizGeneratorPage from './pages/QuizGeneratorPage';
+import QuizHistoryPage from './pages/QuizHistoryPage';
 import ProgressPage from './pages/ProgressPage';
 import MessagingPage from './pages/MessagingPage';
 import ResourcesPage from './pages/ResourcesPage';
@@ -55,6 +56,14 @@ export const router = createBrowserRouter([
         element: (
           <ProtectedRoute requireStudent>
             <QuizGeneratorPage />
+          </ProtectedRoute>
+        )
+      },
+      {
+        path: 'quiz-history',
+        element: (
+          <ProtectedRoute requireStudent>
+            <QuizHistoryPage />
           </ProtectedRoute>
         )
       },
