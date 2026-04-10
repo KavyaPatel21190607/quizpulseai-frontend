@@ -15,6 +15,8 @@ interface GeneratedQuestion {
 interface StoredQuiz {
   _id?: string;
   id?: string;
+  generationMode?: 'standard' | 'spaced-repetition';
+  repetitionLevel?: number;
   questions?: any[];
 }
 
@@ -27,6 +29,8 @@ export default function QuizGeneratorPage() {
   const [timeLimit, setTimeLimit] = useState(30);
   const [difficulty, setDifficulty] = useState<'easy' | 'medium' | 'hard'>('medium');
   const [numberOfQuestions, setNumberOfQuestions] = useState(10);
+  const [generationMode, setGenerationMode] = useState<'standard' | 'spaced-repetition'>('standard');
+  const [repetitionLevel, setRepetitionLevel] = useState(0);
   const [questionTypes, setQuestionTypes] = useState({
     multipleChoice: true,
     trueFalse: true,
@@ -70,6 +74,8 @@ export default function QuizGeneratorPage() {
 
       setQuizId(String(parsedQuiz._id || parsedQuiz.id));
       setGeneratedQuestions(parsedQuestions);
+      setGenerationMode(parsedQuiz.generationMode || 'standard');
+      setRepetitionLevel(Number(parsedQuiz.repetitionLevel || 0));
       setCurrentQuestionIndex(0);
       setUserAnswers({});
       setQuizSubmitted(false);
@@ -104,6 +110,7 @@ export default function QuizGeneratorPage() {
         numberOfQuestions,
         timeLimit,
         questionTypes,
+        generationMode,
       });
 
       const quiz = response?.data?.quiz;
@@ -118,6 +125,8 @@ export default function QuizGeneratorPage() {
 
       setQuizId(String(quiz?.id || quiz?._id));
       setGeneratedQuestions(questions);
+      setGenerationMode(quiz?.generationMode || generationMode);
+      setRepetitionLevel(Number(quiz?.repetitionLevel || 0));
       setGenerating(false);
       setCurrentQuestionIndex(0);
       setUserAnswers({});
@@ -177,6 +186,8 @@ export default function QuizGeneratorPage() {
     setSubject('');
     setGradeClass('');
     setLearningObjectives('');
+    setGenerationMode('standard');
+    setRepetitionLevel(0);
     setUserAnswers({});
     setQuizSubmitted(false);
     setApiError('');
@@ -370,6 +381,12 @@ export default function QuizGeneratorPage() {
               Generate New Quiz
             </button>
           </div>
+
+          {generationMode === 'spaced-repetition' && repetitionLevel > 0 && (
+            <div className="mt-6 rounded-lg border border-border bg-accent/20 p-4 text-sm text-muted-foreground">
+              Spaced repetition round saved: level {repetitionLevel}. Future generations will continue advancing from this history.
+            </div>
+          )}
         </motion.div>
       </div>
     );
@@ -387,6 +404,34 @@ export default function QuizGeneratorPage() {
           Enter your topic and preferences, and let AI create a personalized quiz for you
         </p>
       </motion.div>
+
+      <div className="mb-6 grid gap-3 sm:grid-cols-2">
+        <button
+          type="button"
+          onClick={() => setGenerationMode('standard')}
+          className={`rounded-xl border p-4 text-left transition-all ${
+            generationMode === 'standard'
+              ? 'border-primary bg-primary/10'
+              : 'border-border bg-background hover:bg-accent'
+          }`}
+        >
+          <p className="font-semibold">Standard practice</p>
+          <p className="text-sm text-muted-foreground mt-1">Generate a fresh quiz from your selected topic.</p>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setGenerationMode('spaced-repetition')}
+          className={`rounded-xl border p-4 text-left transition-all ${
+            generationMode === 'spaced-repetition'
+              ? 'border-primary bg-primary/10'
+              : 'border-border bg-background hover:bg-accent'
+          }`}
+        >
+          <p className="font-semibold">Spaced repetition</p>
+          <p className="text-sm text-muted-foreground mt-1">Each repeat raises the level and avoids older question patterns.</p>
+        </button>
+      </div>
 
       <div className="grid md:grid-cols-3 gap-6 mb-8">
         <motion.div
@@ -442,6 +487,15 @@ export default function QuizGeneratorPage() {
         className="bg-background border border-border rounded-xl p-6 lg:p-8"
       >
         <h2 className="text-xl font-semibold mb-6">Quiz Configuration</h2>
+
+        {generationMode === 'spaced-repetition' && (
+          <div className="mb-6 rounded-xl border border-primary/20 bg-primary/5 p-4">
+            <p className="font-medium text-primary">Spaced repetition is enabled</p>
+            <p className="text-sm text-muted-foreground mt-1">
+              The next quiz will use your saved history to generate a harder variant and preserve the repetition round.
+            </p>
+          </div>
+        )}
 
         {apiError && (
           <div className="mb-4 p-3 rounded-lg border border-red-300 text-red-700 bg-red-50 dark:bg-red-900/20 dark:text-red-300 dark:border-red-800">
