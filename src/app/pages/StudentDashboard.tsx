@@ -29,6 +29,12 @@ interface QuizAttempt {
   };
 }
 
+interface LearningStreak {
+  current: number;
+  longest: number;
+  lastQuizCompletedAt?: string | null;
+}
+
 export default function StudentDashboard() {
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
@@ -39,6 +45,7 @@ export default function StudentDashboard() {
     completedQuizzes: 0,
     totalTimeSpent: 0,
   });
+  const [streak, setStreak] = useState<LearningStreak>({ current: 0, longest: 0, lastQuizCompletedAt: null });
   const [attempts, setAttempts] = useState<QuizAttempt[]>([]);
 
   useEffect(() => {
@@ -53,6 +60,7 @@ export default function StudentDashboard() {
 
         const backendStats = progressResponse?.data?.stats || {};
         const backendAttempts = progressResponse?.data?.attempts || [];
+        const backendStreak = progressResponse?.data?.streak || {};
 
         setStats({
           totalQuizzes: Number(backendStats.totalQuizzes || 0),
@@ -62,6 +70,11 @@ export default function StudentDashboard() {
         });
 
         setAttempts(backendAttempts);
+        setStreak({
+          current: Number(backendStreak.current || 0),
+          longest: Number(backendStreak.longest || 0),
+          lastQuizCompletedAt: backendStreak.lastQuizCompletedAt || null,
+        });
       } catch (err: any) {
         setError(err?.message || 'Failed to load dashboard data');
       } finally {
@@ -109,6 +122,13 @@ export default function StudentDashboard() {
       icon: Award,
       color: 'from-purple-500 to-pink-500',
     },
+    {
+      label: 'Current Streak',
+      value: `${streak.current} day${streak.current === 1 ? '' : 's'}`,
+      change: `Longest streak: ${streak.longest} day${streak.longest === 1 ? '' : 's'}`,
+      icon: Calendar,
+      color: 'from-amber-500 to-orange-500',
+    },
   ];
 
   return (
@@ -130,7 +150,7 @@ export default function StudentDashboard() {
         </div>
       )}
 
-      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-8">
+      <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-4 lg:gap-6 mb-8">
         {statCards.map((stat, index) => (
           <motion.div
             key={stat.label}
