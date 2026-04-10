@@ -6,6 +6,7 @@ import {
   History,
   MessageSquare,
   TrendingUp,
+  Flame,
   User,
   LogOut,
   Menu,
@@ -47,6 +48,7 @@ export default function DashboardLayout() {
     { path: '/quiz-generator', icon: Brain, label: 'Quiz Generator' },
     { path: '/quiz-history', icon: History, label: 'Quiz History' },
     { path: '/progress', icon: TrendingUp, label: 'Progress Predictor' },
+    { path: '/streak-progress', icon: Flame, label: 'Streak Progress' },
     { path: '/messages', icon: MessageSquare, label: 'Messages' },
     { path: '/resources', icon: BookOpen, label: 'Resources' },
     { path: '/profile', icon: User, label: 'Profile' }
