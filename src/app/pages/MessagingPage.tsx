@@ -227,6 +227,14 @@ export default function MessagingPage() {
     chat.user.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const existingChatUserIds = new Set(
+    chats.map((chat) => String(chat.user.id)).filter(Boolean)
+  );
+
+  const uniqueSearchStudents = searchStudents.filter(
+    (student) => !existingChatUserIds.has(String(student.id))
+  );
+
   const openConversationWithUser = async (targetUser: SearchStudent) => {
     try {
       setMessageError('');
@@ -438,10 +446,10 @@ export default function MessagingPage() {
                       </p>
                       {searchingStudents ? (
                         <p className="px-4 pb-3 text-sm text-muted-foreground">Searching students...</p>
-                      ) : searchStudents.length === 0 ? (
+                      ) : uniqueSearchStudents.length === 0 ? (
                         <p className="px-4 pb-3 text-sm text-muted-foreground">No matching students.</p>
                       ) : (
-                        searchStudents.map((student) => (
+                        uniqueSearchStudents.map((student) => (
                           <button
                             key={`student-${student.id}`}
                             onClick={async () => openConversationWithUser(student)}
