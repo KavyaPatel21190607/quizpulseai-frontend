@@ -42,6 +42,12 @@ type Attempt = {
   };
 };
 
+type Streak = {
+  current: number;
+  longest: number;
+  lastQuizCompletedAt?: string | null;
+};
+
 type SkillInsight = {
   name: string;
   average: number;
@@ -59,6 +65,7 @@ export default function ProgressPage() {
     completedQuizzes: 0,
     totalTimeSpent: 0,
   });
+  const [streak, setStreak] = useState<Streak>({ current: 0, longest: 0, lastQuizCompletedAt: null });
   const [attempts, setAttempts] = useState<Attempt[]>([]);
 
   useEffect(() => {
@@ -68,12 +75,18 @@ export default function ProgressPage() {
         setError('');
         const response = await apiClient.getUserProgress();
         const backendStats = response?.data?.stats;
+        const backendStreak = response?.data?.streak;
 
         setStats({
           totalQuizzes: backendStats?.totalQuizzes || 0,
           averageScore: Number(backendStats?.averageScore || 0),
           completedQuizzes: backendStats?.completedQuizzes || 0,
           totalTimeSpent: backendStats?.totalTimeSpent || 0,
+        });
+        setStreak({
+          current: Number(backendStreak?.current || 0),
+          longest: Number(backendStreak?.longest || 0),
+          lastQuizCompletedAt: backendStreak?.lastQuizCompletedAt || null,
         });
         setAttempts(Array.isArray(response?.data?.attempts) ? response.data.attempts : []);
       } catch (err: any) {
@@ -271,7 +284,7 @@ export default function ProgressPage() {
             </div>
           ) : (
             <div className="space-y-6">
-              <div className="grid sm:grid-cols-2 gap-4">
+              <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="p-4 rounded-lg border border-border bg-accent/20">
                   <p className="text-sm text-muted-foreground">Quizzes Completed</p>
                   <p className="text-2xl font-bold mt-1">{stats.completedQuizzes}</p>
@@ -287,6 +300,11 @@ export default function ProgressPage() {
                 <div className="p-4 rounded-lg border border-border bg-accent/20">
                   <p className="text-sm text-muted-foreground">Study Time</p>
                   <p className="text-2xl font-bold mt-1">{hoursSpent}h</p>
+                </div>
+                <div className="p-4 rounded-lg border border-border bg-accent/20">
+                  <p className="text-sm text-muted-foreground">Streak</p>
+                  <p className="text-2xl font-bold mt-1">{streak.current} day{streak.current === 1 ? '' : 's'}</p>
+                  <p className="text-xs text-muted-foreground mt-1">Longest: {streak.longest} day{streak.longest === 1 ? '' : 's'}</p>
                 </div>
               </div>
 
