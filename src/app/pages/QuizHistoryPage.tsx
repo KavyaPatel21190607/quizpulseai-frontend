@@ -20,6 +20,8 @@ interface StoredQuiz {
   topic?: string;
   gradeClass?: string;
   difficulty?: 'easy' | 'medium' | 'hard';
+  generationMode?: 'standard' | 'spaced-repetition';
+  repetitionLevel?: number;
   numberOfQuestions?: number;
   questions?: any[];
   createdAt?: string;
@@ -184,6 +186,9 @@ export default function QuizHistoryPage() {
                       </p>
                       <p className="text-xs text-muted-foreground mt-1">
                         Grade: {quiz.gradeClass || 'N/A'} | Difficulty: {quiz.difficulty || 'medium'} | Questions: {quiz.numberOfQuestions || quiz.questions?.length || 0}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Mode: {quiz.generationMode === 'spaced-repetition' ? `Spaced repetition${quiz.repetitionLevel ? ` · Round ${quiz.repetitionLevel}` : ''}` : 'Standard practice'}
                       </p>
                       <p className="text-xs text-muted-foreground mt-1">
                         Created: {formatDate(quiz.createdAt)}
