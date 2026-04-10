@@ -1,4 +1,4 @@
-import { Home, Zap, MessageSquare, TrendingUp, User, Shield, Menu, X } from 'lucide-react';
+import { Home, Zap, MessageSquare, TrendingUp, Flame, User, Shield, Menu, X } from 'lucide-react';
 import { useState } from 'react';
 
 interface SidebarProps {
@@ -15,6 +15,7 @@ export function Sidebar({ currentPage, onNavigate, isAdmin = false }: SidebarPro
     { id: 'quiz', label: 'Quiz Generator', icon: Zap },
     { id: 'messages', label: 'Messages', icon: MessageSquare },
     { id: 'progress', label: 'AI Progress', icon: TrendingUp },
+    { id: 'streak', label: 'Streak Progress', icon: Flame },
     { id: 'profile', label: 'Profile', icon: User },
   ];
 
