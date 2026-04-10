@@ -10,6 +10,7 @@ import {
   BookOpen,
   Calendar,
   Clock,
+  Flame,
 } from 'lucide-react';
 import { Link } from 'react-router';
 import { useAuth } from '../context/AuthContext';
@@ -305,6 +306,18 @@ export default function StudentDashboard() {
           <p className="text-sm text-white/80 mb-4">Get insights into your learning patterns</p>
           <div className="flex items-center gap-2 text-sm font-medium">
             View Insights <ArrowRight className="w-4 h-4" />
+          </div>
+        </Link>
+
+        <Link
+          to="/streak-progress"
+          className="p-6 bg-gradient-to-br from-orange-500 to-amber-500 text-white rounded-xl hover:shadow-lg transition-shadow"
+        >
+          <Flame className="w-10 h-10 mb-4" />
+          <h3 className="text-lg font-semibold mb-2">Streak Progress</h3>
+          <p className="text-sm text-white/80 mb-4">See your daily quiz streak with an animated progress view</p>
+          <div className="flex items-center gap-2 text-sm font-medium">
+            Open Streak <ArrowRight className="w-4 h-4" />
           </div>
         </Link>
       </motion.div>
