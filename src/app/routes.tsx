@@ -8,6 +8,7 @@ import StudentDashboard from './pages/StudentDashboard';
 import QuizGeneratorPage from './pages/QuizGeneratorPage';
 import QuizHistoryPage from './pages/QuizHistoryPage';
 import ProgressPage from './pages/ProgressPage';
+import StreakProgressPage from './pages/StreakProgressPage';
 import MessagingPage from './pages/MessagingPage';
 import ResourcesPage from './pages/ResourcesPage';
 import ProfilePage from './pages/ProfilePage';
@@ -72,6 +73,14 @@ export const router = createBrowserRouter([
         element: (
           <ProtectedRoute requireStudent>
             <ProgressPage />
+          </ProtectedRoute>
+        )
+      },
+      {
+        path: 'streak-progress',
+        element: (
+          <ProtectedRoute requireStudent>
+            <StreakProgressPage />
           </ProtectedRoute>
         )
       },
